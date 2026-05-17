@@ -4,7 +4,7 @@ dsm_parser.py  –  called by Node.js via python-shell
 Reads a PDF path from argv[1], extracts all Intra Solar entities,
 prints JSON to stdout.
 """
-import sys, json, re
+import sys, json, re, gc
 import pdfplumber
 
 
@@ -35,6 +35,12 @@ def get_pdf_text(path):
                 if line:
                     out += line + "\n"
             out += "\f"
+            
+            # Explicitly release page resources to keep memory flat
+            page.flush_cache()
+            if i % 5 == 0:
+                gc.collect()
+    gc.collect()
     return out
 
 
